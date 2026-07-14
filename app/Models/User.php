@@ -35,6 +35,6 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function esAdmin(): bool
     {
-        return $this->rol === 'admin';
+        return $this->rol_id === 1;
     }
 }

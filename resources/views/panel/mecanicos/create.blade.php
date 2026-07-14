@@ -19,6 +19,12 @@
                     </select>
                     @error('especialidad_id')<p class="mt-1.5 text-sm text-red-400">{{ $message }}</p>@enderror
                 </div>
+                <div><label class="block text-sm font-medium text-gray-300 mb-1.5">Sucursal *</label>
+                    <select name="sucursal_id" required class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white">
+                        @foreach($sucursales as $s)<option value="{{ $s->id }}" class="bg-[#1a1a1a]" {{ $loop->first ? 'selected' : '' }}>{{ $s->nombre }}</option>@endforeach
+                    </select>
+                    @error('sucursal_id')<p class="mt-1.5 text-sm text-red-400">{{ $message }}</p>@enderror
+                </div>
                 <div><label class="block text-sm font-medium text-gray-300 mb-1.5">Fecha contratacion *</label><input name="fecha_contratacion" type="date" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white" required></div>
                 <div class="sm:col-span-2"><label class="block text-sm font-medium text-gray-300 mb-1.5">Perfil / observaciones</label><textarea name="descripcion" rows="2" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white" placeholder="Opcional"></textarea></div>
             </div>

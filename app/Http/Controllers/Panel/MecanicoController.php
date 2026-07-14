@@ -5,13 +5,15 @@ namespace App\Http\Controllers\Panel;
 use App\Http\Controllers\Controller;
 use App\Services\MecanicoService;
 use App\Services\EspecialidadService;
+use App\Services\SucursalService;
 use Illuminate\Http\Request;
 
 class MecanicoController extends Controller
 {
     public function __construct(
         protected MecanicoService $mecanicoService,
-        protected EspecialidadService $especialidadService
+        protected EspecialidadService $especialidadService,
+        protected SucursalService $sucursalService
     ) {}
 
     public function index(Request $r)
@@ -23,6 +25,7 @@ class MecanicoController extends Controller
     {
         return view('panel.mecanicos.create', [
             'especialidades' => $this->especialidadService->obtenerTodas(),
+            'sucursales' => $this->sucursalService->activas(),
         ]);
     }
 
@@ -35,6 +38,7 @@ class MecanicoController extends Controller
             'telefono' => 'nullable|string|max:20',
             'direccion' => 'nullable|string|max:255',
             'especialidad_id' => 'required|exists:especialidades,id',
+            'sucursal_id' => 'required|exists:sucursales,id',
             'fecha_contratacion' => 'required|date',
             'descripcion' => 'nullable|string|max:255',
             'observaciones' => 'nullable|string|max:255',
@@ -53,7 +57,8 @@ class MecanicoController extends Controller
     {
         $item = $this->mecanicoService->obtenerPorId($id);
         $especialidades = $this->especialidadService->obtenerTodas();
-        return view('panel.mecanicos.edit', compact('item', 'especialidades'));
+        $sucursales = $this->sucursalService->activas();
+        return view('panel.mecanicos.edit', compact('item', 'especialidades', 'sucursales'));
     }
 
     public function update(Request $r, int $id)
@@ -65,6 +70,7 @@ class MecanicoController extends Controller
             'telefono' => 'nullable|string|max:20',
             'direccion' => 'nullable|string|max:255',
             'especialidad_id' => 'required|exists:especialidades,id',
+            'sucursal_id' => 'required|exists:sucursales,id',
             'fecha_contratacion' => 'required|date',
             'descripcion' => 'nullable|string|max:255',
             'observaciones' => 'nullable|string|max:255',
