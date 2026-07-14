@@ -15,6 +15,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Ruta creada para el trabajo grupal (Xoce)
+Route::get('/xoce', [\App\Http\Controllers\XoceController::class, 'index'])->name('xoce.index');
+
 // Redireccion del dashboard de Breeze al nuevo panel administrativo
 Route::redirect('/dashboard', '/panel/dashboard')->name('dashboard');
 
