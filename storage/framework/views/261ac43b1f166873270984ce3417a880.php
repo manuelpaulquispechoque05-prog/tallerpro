@@ -19,7 +19,8 @@
             <thead><tr class="border-b border-white/[0.04]">
                 <th class="px-5 py-3.5 text-left text-[10px] font-semibold uppercase text-gray-600">Nombre</th>
                 <th class="px-5 py-3.5 text-left text-[10px] font-semibold uppercase text-gray-600">Especialidad</th>
-                <th class="px-5 py-3.5 text-left text-[10px] font-semibold uppercase text-gray-600">Correo</th>
+                <th class="px-5 py-3.5 text-left text-[10px] font-semibold uppercase text-gray-600">Sucursal</th>
+                <th class="px-5 py-3.5 text-left text-[10px] font-semibold uppercase text-gray-600">Telefono</th>
                 <th class="px-5 py-3.5 text-center text-[10px] font-semibold uppercase text-gray-600">Estado</th>
                 <th class="px-5 py-3.5 text-right text-[10px] font-semibold uppercase text-gray-600">Accion</th>
             </tr></thead>
@@ -28,6 +29,7 @@
                 <tr class="border-b border-white/[0.03] hover:bg-white/[0.02]">
                     <td class="px-5 py-4"><span class="text-sm font-medium text-gray-200"><?php echo e($i->nombre_completo); ?></span></td>
                     <td class="px-5 py-4 text-sm text-gray-400"><?php echo e($i->especialidad?->nombre ?? '—'); ?></td>
+                    <td class="px-5 py-4 text-sm text-gray-500"><?php echo e($i->sucursal?->nombre ?? '—'); ?></td>
                     <td class="px-5 py-4 text-sm text-gray-500"><?php echo e($i->telefono ?? '—'); ?></td>
                     <td class="px-5 py-4 text-center">
                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium <?php echo e($i->activo ? 'bg-green-500/10 text-green-400' : 'bg-gray-500/10 text-gray-400'); ?>"><?php echo e($i->activo ? 'Activo' : 'Inactivo'); ?></span>
@@ -39,7 +41,7 @@
                     </td>
                 </tr>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                <tr><td colspan="5" class="px-5 py-10 text-center text-sm text-gray-500">No hay mecanicos registrados</td></tr>
+                <tr><td colspan="6" class="px-5 py-10 text-center text-sm text-gray-500">No hay mecanicos registrados</td></tr>
                 <?php endif; ?>
             </tbody>
         </table>

@@ -64,10 +64,12 @@ class InventarioService
         });
     }
 
-    public function registrarSalida(int $repuestoId, int $cantidad, int $ordenTrabajoId, string $motivo = null): MovimientoInventario
+    public function registrarSalida(int $repuestoId, int $cantidad, int $ordenTrabajoId, int $sucursalId, string $motivo = null): MovimientoInventario
     {
-        return DB::transaction(function () use ($repuestoId, $cantidad, $ordenTrabajoId, $motivo) {
-            $inventario = Inventario::where('repuesto_id', $repuestoId)->first();
+        return DB::transaction(function () use ($repuestoId, $cantidad, $ordenTrabajoId, $sucursalId, $motivo) {
+            $inventario = Inventario::where('repuesto_id', $repuestoId)
+                ->where('sucursal_id', $sucursalId)
+                ->first();
 
             if (!$inventario || $inventario->stock_actual < $cantidad) {
                 $disponible = $inventario?->stock_actual ?? 0;

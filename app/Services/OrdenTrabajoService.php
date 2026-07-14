@@ -101,11 +101,11 @@ class OrdenTrabajoService
         $subtotal = $precio * $cantidad;
 
         DB::transaction(function () use ($orden, $repuesto, $cantidad, $precio, $subtotal, $repuestoId) {
-            // Descontar stock (lanza excepcion si no hay suficiente)
             $this->inventarioService->registrarSalida(
                 $repuestoId,
                 $cantidad,
                 $orden->id,
+                $orden->sucursal_id,
                 "Consumo en orden de trabajo #{$orden->id} — {$repuesto->nombre}"
             );
 

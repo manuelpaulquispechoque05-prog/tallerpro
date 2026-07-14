@@ -25,7 +25,8 @@ class InventarioController extends Controller
     public function ingreso()
     {
         $repuestos = $this->inventarioService->repuestosParaIngreso();
-        return view('panel.inventario.ingreso', compact('repuestos'));
+        $sucursales = \App\Models\Sucursal::where('activo', true)->orderBy('nombre')->get();
+        return view('panel.inventario.ingreso', compact('repuestos', 'sucursales'));
     }
 
     public function storeIngreso(Request $request)

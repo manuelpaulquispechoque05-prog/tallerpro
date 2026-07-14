@@ -11,6 +11,7 @@ use App\Http\Controllers\Panel\OrdenTrabajoController;
 use App\Http\Controllers\Panel\ProfileController;
 use App\Http\Controllers\Panel\ProveedorController;
 use App\Http\Controllers\Panel\RepuestoController;
+use App\Http\Controllers\Panel\SucursalController;
 use App\Http\Controllers\Panel\VehiculoController;
 use Illuminate\Support\Facades\Route;
 
@@ -107,4 +108,12 @@ Route::middleware(['auth', 'verified'])->prefix('panel')->name('panel.')->group(
     Route::get('/mecanicos/{id}/editar', [MecanicoController::class, 'edit'])->name('mecanicos.edit');
     Route::put('/mecanicos/{id}', [MecanicoController::class, 'update'])->name('mecanicos.update');
     Route::delete('/mecanicos/{id}', [MecanicoController::class, 'destroy'])->name('mecanicos.destroy');
+
+    // ─── SUCURSALES (solo admin) ─────────────────────────────────────
+    Route::get('/sucursales', [SucursalController::class, 'index'])->name('sucursales.index');
+    Route::get('/sucursales/crear', [SucursalController::class, 'create'])->name('sucursales.create');
+    Route::post('/sucursales', [SucursalController::class, 'store'])->name('sucursales.store');
+    Route::get('/sucursales/{sucursal}/editar', [SucursalController::class, 'edit'])->name('sucursales.edit');
+    Route::put('/sucursales/{sucursal}', [SucursalController::class, 'update'])->name('sucursales.update');
+    Route::delete('/sucursales/{sucursal}', [SucursalController::class, 'destroy'])->name('sucursales.destroy');
 });

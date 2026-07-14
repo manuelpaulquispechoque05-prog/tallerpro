@@ -8,7 +8,7 @@ class MecanicoService
 {
     public function listar(string $busqueda = null)
     {
-        return Mecanico::with('especialidad')
+        return Mecanico::with('especialidad', 'sucursal')
             ->when($busqueda, fn($q) => $q->where(function ($q) use ($busqueda) {
                 $q->where('nombre', 'like', "%{$busqueda}%")
                   ->orWhere('apellidos', 'like', "%{$busqueda}%")
@@ -39,7 +39,7 @@ class MecanicoService
             'telefono' => $data['telefono'] ?? null,
             'direccion' => $data['direccion'] ?? null,
             'especialidad_id' => $data['especialidad_id'],
-            'sucursal_id' => $data['sucursal_id'] ?? 1,
+            'sucursal_id' => $data['sucursal_id'],
             'descripcion' => $data['descripcion'] ?? null,
             'observaciones' => $data['observaciones'] ?? null,
             'foto' => $data['foto'] ?? null,
@@ -58,7 +58,7 @@ class MecanicoService
             'telefono' => $data['telefono'] ?? $m->telefono,
             'direccion' => $data['direccion'] ?? $m->direccion,
             'especialidad_id' => $data['especialidad_id'],
-            'sucursal_id' => $data['sucursal_id'] ?? $m->sucursal_id,
+            'sucursal_id' => $data['sucursal_id'],
             'descripcion' => $data['descripcion'] ?? $m->descripcion,
             'observaciones' => $data['observaciones'] ?? $m->observaciones,
             'fecha_contratacion' => $data['fecha_contratacion'],
