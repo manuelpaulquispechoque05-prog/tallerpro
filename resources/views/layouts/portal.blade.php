@@ -23,7 +23,9 @@
                 </a>
 
                 <div class="flex items-center gap-3">
-                    <a href="#" class="text-sm text-gray-400 hover:text-white transition">Reservar cita</a>
+                    <a href="{{ route('portal.inicio') }}" class="text-sm text-gray-400 hover:text-white transition">Inicio</a>
+                    <a href="{{ route('portal.vehiculos.index') }}" class="text-sm text-gray-400 hover:text-white transition">Mis vehiculos</a>
+                    <a href="#" class="text-sm text-gray-400 hover:text-white transition">Mis citas</a>
                     <a href="#" class="text-sm text-gray-400 hover:text-white transition">Mis ordenes</a>
                     <form method="POST" action="{{ route('logout') }}" class="inline">
                         @csrf
