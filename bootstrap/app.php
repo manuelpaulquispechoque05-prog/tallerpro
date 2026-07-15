@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'admin' => \App\Http\Middleware\EsAdministrador::class,
+            'cliente' => \App\Http\Middleware\EsCliente::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
