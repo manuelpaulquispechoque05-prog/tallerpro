@@ -13,6 +13,10 @@ class MovimientoInventario extends Model
 
     public $timestamps = false;
 
+    protected $casts = [
+        'created_at' => 'datetime',
+    ];
+
     protected $fillable = [
         'inventario_id', 'orden_trabajo_id', 'user_id',
         'tipo', 'cantidad', 'motivo',

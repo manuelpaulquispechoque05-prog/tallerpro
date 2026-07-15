@@ -2,7 +2,35 @@
 @section('title', 'Inventario')
 
 @section('content')
-<!-- Alertas de stock -->
+<!-- Warehouse indicators -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+    <div class="glass-card rounded-2xl p-5">
+        <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/20 flex items-center justify-center"><svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></div>
+        <div><p class="text-2xl font-bold text-white">{{ $items->total() }}</p><p class="text-xs text-gray-500">Productos</p></div></div>
+    </div>
+    <div class="glass-card rounded-2xl p-5">
+        <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500/20 to-red-600/20 flex items-center justify-center"><svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.054 0 1.632-1.159.9-2l-6.929-6.858c-.494-.49-1.306-.49-1.8 0L3.162 17c-.732.841.154 2.1.9 2.1z"/></svg></div>
+        <div><p class="text-2xl font-bold text-red-400">{{ $alertas['agotados']->count() }}</p><p class="text-xs text-gray-500">Stock critico</p></div></div>
+    </div>
+    <div class="glass-card rounded-2xl p-5">
+        <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-600/20 flex items-center justify-center"><svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+        <div><p class="text-2xl font-bold text-amber-400">{{ $alertas['bajos']->count() }}</p><p class="text-xs text-gray-500">Stock bajo</p></div></div>
+    </div>
+    <div class="glass-card rounded-2xl p-5">
+        <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500/20 to-green-600/20 flex items-center justify-center"><svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+        <div><p class="text-2xl font-bold text-green-400">{{ $alertas['bajos']->count() }}</p><p class="text-xs text-gray-500">Stock normal</p></div></div>
+    </div>
+</div>
+
+<!-- Action buttons -->
+<div class="flex gap-3 mb-6">
+    <a href="{{ route('panel.inventario.ingreso') }}" class="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-500 text-white text-sm font-semibold rounded-xl transition shadow-lg shadow-blue-500/25">
+        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+        Nuevo ingreso
+    </a>
+    <a href="{{ route('panel.inventario.movimientos') }}" class="inline-flex items-center px-5 py-2.5 bg-white/5 border border-white/10 text-gray-300 text-sm font-medium rounded-xl transition">Movimientos</a>
+</div>
+
 @php $hasAlertas = $alertas['agotados']->count() > 0 || $alertas['bajos']->count() > 0; @endphp
 @if($hasAlertas)
 <div class="animate-in glass-card rounded-2xl p-5 lg:p-6 mb-6">
@@ -28,18 +56,9 @@
 @endif
 
 <div class="glass-card rounded-2xl overflow-hidden">
-    <div class="px-5 lg:px-6 py-4 border-b border-white/[0.06] flex items-center justify-between">
-        <div>
-            <h3 class="text-sm font-semibold text-gray-100">Inventario general</h3>
-            <p class="text-xs text-gray-500 mt-0.5">Stock por repuesto</p>
-        </div>
-        <div class="flex gap-2">
-            <a href="{{ route('panel.inventario.ingreso') }}" class="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-blue-600 to-blue-500 text-white text-xs font-semibold rounded-full transition shadow-lg shadow-blue-500/25">
-                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-                Ingreso
-            </a>
-            <a href="{{ route('panel.inventario.movimientos') }}" class="text-xs font-medium text-blue-400 hover:text-blue-300 transition">Movimientos</a>
-        </div>
+    <div class="px-5 lg:px-6 py-4 border-b border-white/[0.06]">
+        <h3 class="text-sm font-semibold text-gray-100">Inventario general</h3>
+        <p class="text-xs text-gray-500 mt-0.5">Stock por repuesto</p>
     </div>
     <div class="px-5 lg:px-6 py-3 border-b border-white/[0.06]">
         <form method="GET" x-data>

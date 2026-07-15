@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\CompleteRegistrationController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
@@ -38,6 +39,12 @@ Route::middleware('guest')->group(function () {
     Route::get('auth/google/callback', [GoogleAuthController::class, 'callback'])
         ->middleware('throttle:login')
         ->name('google.callback');
+
+    // Completar registro para usuarios nuevos de Google
+    Route::get('completar-registro', [CompleteRegistrationController::class, 'show'])
+        ->name('register.complete');
+    Route::post('completar-registro', [CompleteRegistrationController::class, 'store'])
+        ->name('register.complete.store');
 
     Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
         ->name('password.reset');

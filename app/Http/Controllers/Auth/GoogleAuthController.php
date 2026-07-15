@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Laravel\Socialite\Facades\Socialite;
@@ -12,12 +13,17 @@ class GoogleAuthController extends Controller
 {
     public function redirect()
     {
-        return Socialite::driver('google')->redirect();
+        return Socialite::driver('google')
+            ->redirectUrl(url('/auth/google/callback'))
+            ->redirect();
     }
 
-    public function callback()
+    public function callback(Request $request)
     {
-        $googleUser = Socialite::driver('google')->stateless()->user();
+        $googleUser = Socialite::driver('google')
+            ->redirectUrl(url('/auth/google/callback'))
+            ->stateless()
+            ->user();
 
         $user = User::where('provider_id', $googleUser->id)
             ->orWhere('email', $googleUser->email)
@@ -31,30 +37,23 @@ class GoogleAuthController extends Controller
                     'avatar'      => $googleUser->avatar,
                 ])->save();
             }
-        } else {
-            $rolCliente = DB::table('roles')->where('nombre', 'Cliente')->first();
-            $rolClienteId = $rolCliente?->id;
 
-            $user = User::create([
-                'name'              => $googleUser->name,
-                'email'             => $googleUser->email,
-                'avatar'            => $googleUser->avatar,
-                'rol_id'            => $rolClienteId,
-                'email_verified_at' => now(),
-            ]);
+            Auth::login($user);
 
-            $user->forceFill([
-                'provider'    => 'google',
-                'provider_id' => $googleUser->id,
-            ])->save();
+            if ($user->esCliente()) {
+                return redirect()->intended(route('portal.inicio'));
+            }
+            return redirect()->intended(route('panel.dashboard'));
         }
 
-        Auth::login($user);
+        $request->session()->put('google_register', [
+            'name'        => $googleUser->name,
+            'email'       => $googleUser->email,
+            'avatar'      => $googleUser->avatar,
+            'provider'    => 'google',
+            'provider_id' => $googleUser->id,
+        ]);
 
-        if ($user->esCliente()) {
-            return redirect()->intended(route('portal.inicio'));
-        }
-
-        return redirect()->intended(route('panel.dashboard'));
+        return redirect()->route('register.complete');
     }
 }

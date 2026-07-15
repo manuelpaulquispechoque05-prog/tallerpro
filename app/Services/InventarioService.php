@@ -91,9 +91,14 @@ class InventarioService
         });
     }
 
-    public function movimientos(int $inventarioId = null, int $limit = 20)
+    public function movimientos(int $inventarioId = null, int $limit = 30)
     {
-        return MovimientoInventario::with(['inventario.repuesto.categoria', 'usuario', 'ordenTrabajo'])
+        return MovimientoInventario::with([
+            'inventario.repuesto.categoria',
+            'inventario.sucursal',
+            'usuario',
+            'ordenTrabajo',
+        ])
             ->when($inventarioId, fn($q) => $q->where('inventario_id', $inventarioId))
             ->latest('created_at')
             ->take($limit)
@@ -102,7 +107,12 @@ class InventarioService
 
     public function movimientosPorRepuesto(int $repuestoId, int $limit = 50)
     {
-        return MovimientoInventario::with(['inventario.repuesto', 'usuario', 'ordenTrabajo'])
+        return MovimientoInventario::with([
+            'inventario.repuesto.categoria',
+            'inventario.sucursal',
+            'usuario',
+            'ordenTrabajo',
+        ])
             ->whereHas('inventario', fn($q) => $q->where('repuesto_id', $repuestoId))
             ->latest('created_at')
             ->take($limit)

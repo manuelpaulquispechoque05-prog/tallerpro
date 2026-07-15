@@ -35,13 +35,14 @@
                             </span>
                         </td>
                         <td class="px-5 py-4 text-right text-sm font-medium text-gray-200">{{ $m->cantidad }}</td>
-                        <td class="px-5 py-4 text-sm text-gray-500 max-w-xs truncate">{{ $m->motivo ?? '—' }}</td>
+                        <td class="px-5 py-4"><span class="text-sm text-gray-200">{{ $m->inventario?->repuesto?->nombre ?? '—' }}</span><br><span class="text-xs text-gray-600">{{ $m->inventario?->repuesto?->codigo ?? '' }}</span></td>
+                        <td class="px-5 py-4 text-sm text-gray-400">{{ $m->inventario?->sucursal?->nombre ?? '—' }}</td>
                         <td class="px-5 py-4 text-sm text-gray-500">{{ $m->ordenTrabajo ? '#' . $m->ordenTrabajo->id : '—' }}</td>
                         <td class="px-5 py-4 text-sm text-gray-500">{{ $m->usuario?->name ?? '—' }}</td>
                         <td class="px-5 py-4 text-xs text-gray-600">{{ $m->created_at ? $m->created_at->format('d/m/Y H:i') : '—' }}</td>
                     </tr>
                     @empty
-                    <tr><td colspan="6" class="px-5 py-10 text-center text-sm text-gray-500">Sin movimientos registrados</td></tr>
+                    <tr><td colspan="7" class="px-5 py-10 text-center text-sm text-gray-500">Sin movimientos registrados</td></tr>
                     @endforelse
                 </tbody>
             </table>
