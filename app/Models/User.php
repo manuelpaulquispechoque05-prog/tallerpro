@@ -10,17 +10,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-// MustVerifyEmail obliga a verificar el correo antes de acceder al dashboard
-#[Fillable(['name', 'email', 'password', 'provider', 'provider_id', 'avatar', 'rol'])]
+#[Fillable(['name', 'email', 'password', 'avatar', 'rol_id'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * Get the attributes that should be cast.
-     */
     protected function casts(): array
     {
         return [
@@ -29,12 +25,27 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    /**
-     * Verifica si el usuario tiene rol de administrador.
-     * Usado en Policies y en el sidebar de la vista.
-     */
+    // ─── RELACIONES ──────────────────────────────────────────────────
+
+    public function rol()
+    {
+        return $this->belongsTo(Role::class, 'rol_id');
+    }
+
+    // ─── VERIFICACION DE ROLES ───────────────────────────────────────
+
+    public function tieneRol(string $nombreRol): bool
+    {
+        return $this->rol?->nombre === $nombreRol;
+    }
+
     public function esAdmin(): bool
     {
-        return $this->rol_id === 1;
+        return $this->tieneRol('Administrador');
+    }
+
+    public function esCliente(): bool
+    {
+        return $this->tieneRol('Cliente');
     }
 }

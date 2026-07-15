@@ -11,15 +11,24 @@ class AdminUserSeeder extends Seeder
 {
     public function run(): void
     {
-        $rol = DB::table('roles')->where('nombre', 'Administrador')->first();
-
-        if (!$rol) {
-            $rolId = DB::table('roles')->insertGetId([
+        // Crear rol Administrador si no existe
+        $rolAdmin = DB::table('roles')->where('nombre', 'Administrador')->first();
+        if (!$rolAdmin) {
+            $rolAdminId = DB::table('roles')->insertGetId([
                 'nombre' => 'Administrador',
                 'descripcion' => 'Acceso completo al sistema',
             ]);
         } else {
-            $rolId = $rol->id;
+            $rolAdminId = $rolAdmin->id;
+        }
+
+        // Crear rol Cliente si no existe
+        $rolCliente = DB::table('roles')->where('nombre', 'Cliente')->first();
+        if (!$rolCliente) {
+            DB::table('roles')->insert([
+                'nombre' => 'Cliente',
+                'descripcion' => 'Acceso al portal del cliente',
+            ]);
         }
 
         $plainPassword = 'Admin.2026';
@@ -29,7 +38,7 @@ class AdminUserSeeder extends Seeder
             [
                 'name' => 'Manuel Paul Quispe Choque',
                 'password' => Hash::make($plainPassword),
-                'rol_id' => $rolId,
+                'rol_id' => $rolAdminId,
                 'email_verified_at' => now(),
                 'activo' => true,
             ]
