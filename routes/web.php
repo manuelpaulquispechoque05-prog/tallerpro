@@ -55,10 +55,9 @@ Route::middleware('auth')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| RUTAS DEL PORTAL DEL CLIENTE (PROXIMAMENTE)
+| RUTAS DEL PORTAL DEL CLIENTE (VERSION TEMPORAL)
 |--------------------------------------------------------------------------
-| Reserva de citas, consulta de ordenes, etc.
-| Se habilitaran cuando desarrollemos el modulo del portal.
+| Mientras se desarrolla el modulo completo, redirige a una vista placeholder.
 |--------------------------------------------------------------------------
 */
-// require __DIR__.'/portal.php';
+require __DIR__.'/portal.php';

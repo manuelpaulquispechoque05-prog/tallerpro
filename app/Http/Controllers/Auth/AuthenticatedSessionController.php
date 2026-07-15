@@ -28,7 +28,11 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        if ($request->user()->esCliente()) {
+            return redirect()->intended(route('portal.inicio'));
+        }
+
+        return redirect()->intended(route('panel.dashboard'));
     }
 
     /**
