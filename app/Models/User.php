@@ -32,6 +32,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(Role::class, 'rol_id');
     }
 
+    public function cliente()
+    {
+        return $this->hasOne(Cliente::class, 'user_id');
+    }
+
     // ─── VERIFICACION DE ROLES ───────────────────────────────────────
 
     public function tieneRol(string $nombreRol): bool
