@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
+use App\Services\ConfiguracionService;
 use App\Services\InventarioService;
 use App\Services\RepuestoService;
 use Illuminate\Http\Request;
@@ -11,7 +12,8 @@ class InventarioController extends Controller
 {
     public function __construct(
         protected InventarioService $inventarioService,
-        protected RepuestoService $repuestoService
+        protected RepuestoService $repuestoService,
+        protected ConfiguracionService $configuracionService,
     ) {}
 
     public function index(Request $request)
@@ -26,7 +28,8 @@ class InventarioController extends Controller
     {
         $repuestos = $this->inventarioService->repuestosParaIngreso();
         $sucursales = \App\Models\Sucursal::where('activo', true)->orderBy('nombre')->get();
-        return view('panel.inventario.ingreso', compact('repuestos', 'sucursales'));
+        $tipoCambio = $this->configuracionService->getTipoCambio();
+        return view('panel.inventario.ingreso', compact('repuestos', 'sucursales', 'tipoCambio'));
     }
 
     public function storeIngreso(Request $request)
@@ -37,6 +40,8 @@ class InventarioController extends Controller
             'numero_factura' => 'nullable|string|max:50',
             'observaciones' => 'nullable|string|max:255',
             'sucursal_id' => 'nullable|exists:sucursales,id',
+            'precio_unitario' => 'nullable|numeric|min:0',
+            'moneda' => 'nullable|in:Bs,USD',
         ]);
 
         try {

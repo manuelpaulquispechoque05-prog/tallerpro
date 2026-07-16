@@ -4,9 +4,15 @@ namespace App\Services;
 
 use App\Models\Cita;
 use App\Models\Mecanico;
+use Illuminate\Support\Facades\DB;
 
 class CitaService
 {
+    public function __construct(
+        protected OrdenTrabajoService $ordenTrabajoService,
+        protected DisponibilidadCitaService $disponibilidadService,
+    ) {}
+
     public function listar(string $busqueda = null, string $estadoFiltro = null, string $ordenarPor = 'fecha_hora', string $direccion = 'asc')
     {
         $columnas = ['id', 'fecha_hora', 'estado', 'created_at'];
@@ -47,39 +53,107 @@ class CitaService
 
     public function asignarMecanico(int $id, int $mecanicoId): Cita
     {
-        $cita = Cita::findOrFail($id);
+        $cita = Cita::with('vehiculo', 'ordenTrabajo')->findOrFail($id);
 
-        if (!in_array($cita->estado, ['confirmada', 'pendiente'])) {
-            throw new \RuntimeException('Solo se puede asignar mecanico a citas confirmadas o pendientes.');
+        if (!in_array($cita->estado, ['confirmada', 'asignada'])) {
+            throw new \RuntimeException('No se puede asignar mecanico en el estado actual.');
+        }
+
+        // Si ya tiene orden, verificar estado para reasignacion
+        if ($cita->orden_trabajo_id) {
+            if (in_array($cita->ordenTrabajo->estado, ['completado', 'cancelado'])) {
+                throw new \RuntimeException('No se puede reasignar mecanico. La orden esta ' . $cita->ordenTrabajo->estado);
+            }
+        }
+
+        // Verificar disponibilidad del mecanico
+        $disponible = $this->disponibilidadService->mecanicoDisponible(
+            mecanicoId: $mecanicoId,
+            sucursalId: $cita->sucursal_id,
+            fecha: $cita->fecha_hora->format('Y-m-d'),
+            hora: $cita->fecha_hora->format('H:i'),
+            duracionMinutos: $cita->duracion_minutos,
+            excluirCitaId: $cita->id,
+        );
+
+        if (!$disponible) {
+            throw new \RuntimeException('El mecanico seleccionado no esta disponible en esa fecha y horario.');
         }
 
         $mecanico = Mecanico::findOrFail($mecanicoId);
 
-        $cita->update([
-            'mecanico_id' => $mecanico->id,
-            'estado' => 'asignada',
-        ]);
+        DB::transaction(function () use ($cita, $mecanico) {
+            $cita->update([
+                'mecanico_id' => $mecanico->id,
+                'estado' => 'asignada',
+            ]);
 
+            // Si ya existe orden (reasignacion), actualizar mecanico
+            if ($cita->orden_trabajo_id) {
+                $cita->ordenTrabajo->update(['mecanico_id' => $mecanico->id]);
+            }
+        });
+
+        $cita->refresh();
         return $cita;
+    }
+
+    /**
+     * Vincula un vehiculo a una cita y crea la orden si ya hay mecanico asignado.
+     */
+    public function vincularVehiculo(int $citaId, int $vehiculoId, ?int $kilometraje = null): void
+    {
+        DB::transaction(function () use ($citaId, $vehiculoId, $kilometraje) {
+            $cita = Cita::with('vehiculo', 'ordenTrabajo')->lockForUpdate()->findOrFail($citaId);
+
+            if ($cita->vehiculo_id) {
+                return; // Ya tiene vehiculo, no hacer nada
+            }
+
+            $cita->update([
+                'vehiculo_id' => $vehiculoId,
+            ]);
+
+            // Si tiene mecanico asignado pero no orden, crearla ahora
+            if ($cita->mecanico_id && !$cita->orden_trabajo_id) {
+                $orden = $this->ordenTrabajoService->crearDesdeCita($cita->id);
+                $cita->setRelation('ordenTrabajo', $orden);
+            }
+        });
     }
 
     public function cancelar(int $id): Cita
     {
-        $cita = Cita::findOrFail($id);
+        $cita = Cita::with('ordenTrabajo')->findOrFail($id);
 
         if (in_array($cita->estado, ['atendida'])) {
             throw new \RuntimeException('No se puede cancelar una cita ya atendida.');
         }
 
         $cita->update(['estado' => 'cancelada']);
+
         return $cita;
     }
 
-    public function obtenerMecanicosDisponibles()
+    public function obtenerMecanicosDisponibles(Cita $cita)
     {
-        return Mecanico::where('activo', true)
+        $mecanicos = Mecanico::where('activo', true)
             ->with('especialidad')
             ->orderBy('nombre')
             ->get();
+
+        // Marcar disponibilidad segun la cita
+        foreach ($mecanicos as $m) {
+            $m->disponible = $this->disponibilidadService->mecanicoDisponible(
+                mecanicoId: $m->id,
+                sucursalId: $cita->sucursal_id,
+                fecha: $cita->fecha_hora->format('Y-m-d'),
+                hora: $cita->fecha_hora->format('H:i'),
+                duracionMinutos: $cita->duracion_minutos,
+                excluirCitaId: $cita->id,
+            );
+        }
+
+        return $mecanicos;
     }
 }

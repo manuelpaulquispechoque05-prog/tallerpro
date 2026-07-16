@@ -40,19 +40,35 @@ class="space-y-5">
     <div class="relative">
         <label class="block text-sm font-medium text-gray-300 mb-1.5">Cliente *</label>
         <input type="hidden" name="cliente_id" x-model="clienteId">
-        <input type="text" x-model="clienteTexto" @input.debounce.300ms="buscarClientes()" @focus="if(resultados.length) abierto = true" @click.away="abierto = false"
-               class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition"
-               placeholder="Buscar cliente por nombre o CI...">
-        <div x-show="cargando" class="absolute right-3 top-10"><svg class="animate-spin w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg></div>
-        <div x-show="abierto && resultados.length" x-transition class="absolute z-20 mt-1 w-full rounded-xl bg-[#1a1a1a] border border-white/10 shadow-2xl max-h-48 overflow-y-auto">
-            <template x-for="c in resultados" :key="c.id">
-                <button type="button" @click="seleccionarCliente(c)" class="w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-white/[0.04] transition border-b border-white/[0.03] last:border-0">
-                    <span class="font-medium" x-text="c.nombre + ' ' + c.apellido"></span>
-                    <span class="text-gray-500 ml-2" x-text="'(' + c.ci_nit + ')'"></span>
-                    <span class="text-gray-600 ml-2 text-xs" x-text="c.telefono ? '📞 ' + c.telefono : ''"></span>
-                </button>
-            </template>
+
+        <!-- Cuando viene desde una cita: solo lectura -->
+        <div x-show="clienteId" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10">
+            <div class="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 text-xs font-bold shrink-0">
+                <span x-text="clienteTexto.charAt(0).toUpperCase()"></span>
+            </div>
+            <div>
+                <p class="text-sm text-gray-200 font-medium" x-text="clienteTexto"></p>
+                <p class="text-xs text-gray-500">Cliente asociado a la cita</p>
+            </div>
         </div>
+
+        <!-- Cuando NO viene desde una cita: busqueda editable -->
+        <div x-show="!clienteId">
+            <input type="text" x-model="clienteTexto" @input.debounce.300ms="buscarClientes()" @focus="if(resultados.length) abierto = true" @click.away="abierto = false"
+                   class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition"
+                   placeholder="Buscar cliente por nombre o CI...">
+            <div x-show="cargando" class="absolute right-3 top-10"><svg class="animate-spin w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg></div>
+            <div x-show="abierto && resultados.length" x-transition class="absolute z-20 mt-1 w-full rounded-xl bg-[#1a1a1a] border border-white/10 shadow-2xl max-h-48 overflow-y-auto">
+                <template x-for="c in resultados" :key="c.id">
+                    <button type="button" @click="seleccionarCliente(c)" class="w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-white/[0.04] transition border-b border-white/[0.03] last:border-0">
+                        <span class="font-medium" x-text="c.nombre + ' ' + c.apellido"></span>
+                        <span class="text-gray-500 ml-2" x-text="'(' + c.ci_nit + ')'"></span>
+                        <span class="text-gray-600 ml-2 text-xs" x-text="c.telefono ? '📞 ' + c.telefono : ''"></span>
+                    </button>
+                </template>
+            </div>
+        </div>
+
         @error('cliente_id')<p class="mt-1.5 text-sm text-red-400">{{ $message }}</p>@enderror
     </div>
 

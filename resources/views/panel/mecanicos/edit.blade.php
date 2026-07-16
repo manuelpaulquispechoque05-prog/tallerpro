@@ -16,6 +16,11 @@
                         @foreach($especialidades as $e)<option value="{{ $e->id }}" class="bg-[#1a1a1a]" {{ $item->especialidad_id == $e->id ? 'selected' : '' }}>{{ $e->nombre }}</option>@endforeach
                     </select>
                 </div>
+                <div><label class="block text-sm font-medium text-gray-300 mb-1.5">Sucursal *</label>
+                    <select name="sucursal_id" required class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white">
+                        @foreach($sucursales as $s)<option value="{{ $s->id }}" class="bg-[#1a1a1a]" {{ $item->sucursal_id == $s->id ? 'selected' : '' }}>{{ $s->nombre }}</option>@endforeach
+                    </select>
+                </div>
                 <div><label class="block text-sm font-medium text-gray-300 mb-1.5">Activo</label>
                     <select name="activo" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white">
                         <option value="1" class="bg-[#1a1a1a]" {{ $item->activo ? 'selected' : '' }}>Activo</option>

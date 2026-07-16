@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\DB;
 
 class InventarioService
 {
+    public function __construct(
+        protected ConfiguracionService $configuracionService
+    ) {}
     public function listar(string $busqueda = null)
     {
         return Inventario::with(['repuesto.categoria', 'repuesto.proveedor', 'sucursal'])
@@ -53,14 +56,29 @@ class InventarioService
                 $motivo .= ' — ' . $data['observaciones'];
             }
 
-            return MovimientoInventario::create([
+            $movData = [
                 'inventario_id' => $inventario->id,
                 'orden_trabajo_id' => null,
                 'user_id' => auth()->id(),
                 'tipo' => 'entrada',
                 'cantidad' => $data['cantidad'],
                 'motivo' => $motivo,
-            ]);
+            ];
+
+            // Si se proporcionaron datos de precio/moneda, guardarlos
+            $moneda = $data['moneda'] ?? 'Bs';
+            $precioOriginal = $data['precio_unitario'] ?? null;
+
+            if ($precioOriginal !== null && $precioOriginal > 0) {
+                $conversion = $this->configuracionService->convertirABs($precioOriginal, $moneda);
+
+                $movData['precio_unitario_original'] = $precioOriginal;
+                $movData['moneda'] = $conversion['moneda'];
+                $movData['tipo_cambio'] = $conversion['tipo_cambio'];
+                $movData['precio_unitario_bs'] = $conversion['monto_bs'];
+            }
+
+            return MovimientoInventario::create($movData);
         });
     }
 

@@ -11,4 +11,9 @@ class TipoVehiculo extends Model
     public $timestamps = false;
 
     protected $fillable = ['nombre'];
+
+    public function servicioPrecios()
+    {
+        return $this->hasMany(ServicioPrecio::class);
+    }
 }

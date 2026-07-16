@@ -27,7 +27,8 @@
                 <div class="hidden md:flex items-center gap-5">
                     <a href="{{ route('portal.inicio') }}" class="text-sm text-gray-400 hover:text-white transition">Inicio</a>
                     <a href="{{ route('portal.vehiculos.index') }}" class="text-sm text-gray-400 hover:text-white transition">Mis vehiculos</a>
-                    <a href="#" class="text-sm text-gray-400 hover:text-white transition">Mis citas</a>
+                    <a href="{{ route('portal.citas.index') }}" class="text-sm text-gray-400 hover:text-white transition">Mis citas</a>
+                    <a href="{{ route('portal.citas.create') }}" class="text-sm text-gray-400 hover:text-white transition">Reservar</a>
                     <a href="#" class="text-sm text-gray-400 hover:text-white transition">Mis ordenes</a>
                     <a href="{{ route('portal.perfil') }}" class="text-sm text-gray-400 hover:text-white transition">Mi perfil</a>
                     <form method="POST" action="{{ route('logout') }}" class="inline">
@@ -51,7 +52,8 @@
             <div class="px-4 py-4 space-y-3">
                 <a href="{{ route('portal.inicio') }}" @click="open = false" class="block text-sm text-gray-300 hover:text-white">Inicio</a>
                 <a href="{{ route('portal.vehiculos.index') }}" @click="open = false" class="block text-sm text-gray-300 hover:text-white">Mis vehiculos</a>
-                <a href="#" @click="open = false" class="block text-sm text-gray-300 hover:text-white">Mis citas</a>
+                <a href="{{ route('portal.citas.index') }}" @click="open = false" class="block text-sm text-gray-300 hover:text-white">Mis citas</a>
+                <a href="{{ route('portal.citas.create') }}" @click="open = false" class="block text-sm text-gray-300 hover:text-white">Reservar</a>
                 <a href="#" @click="open = false" class="block text-sm text-gray-300 hover:text-white">Mis ordenes</a>
                 <a href="{{ route('portal.perfil') }}" @click="open = false" class="block text-sm text-gray-300 hover:text-white">Mi perfil</a>
                 <hr class="border-white/[0.06]">

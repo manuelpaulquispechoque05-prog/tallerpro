@@ -52,10 +52,19 @@ Route::middleware(['auth', 'verified'])->prefix('panel')->name('panel.')->group(
         Route::get('/citas/{cita}/confirmar', [CitaController::class, 'confirmar'])->name('citas.confirmar');
         Route::post('/citas/{cita}/asignar-mecanico', [CitaController::class, 'asignarMecanico'])->name('citas.asignar-mecanico');
         Route::get('/citas/{cita}/cancelar', [CitaController::class, 'cancelar'])->name('citas.cancelar');
-        Route::get('/citas/{cita}/crear-orden', [CitaController::class, 'crearOrden'])->name('citas.crear-orden');
 
-        Route::get('/ordenes', [OrdenTrabajoController::class, 'index'])->name('ordenes.index');
-        Route::get('/ordenes/{orden}', [OrdenTrabajoController::class, 'show'])->name('ordenes.show');
+
+    Route::get('/ordenes', [OrdenTrabajoController::class, 'index'])->name('ordenes.index');
+    Route::get('/ordenes/{orden}', [OrdenTrabajoController::class, 'show'])->name('ordenes.show');
+
+    // Acciones sobre ordenes
+    Route::post('/ordenes/{orden}/servicios', [OrdenTrabajoController::class, 'agregarServicio'])->name('ordenes.servicios.store');
+    Route::delete('/ordenes/{orden}/servicios/{detalle}', [OrdenTrabajoController::class, 'quitarServicio'])->name('ordenes.servicios.destroy');
+    Route::post('/ordenes/{orden}/repuestos', [OrdenTrabajoController::class, 'agregarRepuesto'])->name('ordenes.repuestos.store');
+    Route::delete('/ordenes/{orden}/repuestos/{detalle}', [OrdenTrabajoController::class, 'quitarRepuesto'])->name('ordenes.repuestos.destroy');
+    Route::post('/ordenes/{orden}/iniciar', [OrdenTrabajoController::class, 'iniciar'])->name('ordenes.iniciar');
+    Route::post('/ordenes/{orden}/completar', [OrdenTrabajoController::class, 'completar'])->name('ordenes.completar');
+    Route::post('/ordenes/{orden}/cancelar', [OrdenTrabajoController::class, 'cancelar'])->name('ordenes.cancelar');
 
         Route::get('/repuestos', [RepuestoController::class, 'index'])->name('repuestos.index');
         Route::get('/repuestos/crear', [RepuestoController::class, 'create'])->name('repuestos.create');

@@ -18,6 +18,9 @@ class DatabaseSeeder extends Seeder
             MarcaVehiculoSeeder::class,
             ModeloVehiculoSeeder::class,
             ServicioSeeder::class,
+            ServicioPrecioSeeder::class,
+            ConfiguracionSeeder::class,
+            MecanicoConHorarioSeeder::class,
             AdminUserSeeder::class,
         ]);
     }

@@ -5,13 +5,15 @@ namespace App\Http\Controllers\Panel;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Panel\StoreVehiculoRequest;
 use App\Http\Requests\Panel\UpdateVehiculoRequest;
+use App\Services\CitaService;
 use App\Services\VehiculoService;
 use Illuminate\Http\Request;
 
 class VehiculoController extends Controller
 {
     public function __construct(
-        protected VehiculoService $vehiculoService
+        protected VehiculoService $vehiculoService,
+        protected CitaService $citaService,
     ) {}
 
     public function index(Request $request)
@@ -50,9 +52,9 @@ class VehiculoController extends Controller
     {
         $vehiculo = $this->vehiculoService->crear($request->validated());
 
-        // Si viene de una cita, asociamos el vehiculo y redirigimos de vuelta
+        // Si viene de una cita: vincular vehiculo y crear orden si corresponde
         if ($citaId = $request->get('cita_id')) {
-            \App\Models\Cita::where('id', $citaId)->update(['vehiculo_id' => $vehiculo->id]);
+            $this->citaService->vincularVehiculo($citaId, $vehiculo->id, $request->get('kilometraje'));
             return redirect()->route('panel.citas.show', $citaId)
                 ->with('success', 'Vehiculo registrado y asociado a la cita correctamente.');
         }

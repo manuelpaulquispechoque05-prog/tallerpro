@@ -67,7 +67,7 @@
                                 {{ ucfirst($o->estado) }}
                             </span>
                         </td>
-                        <td class="px-5 py-4 font-medium text-gray-200">${{ number_format($o->total, 0) }}</td>
+                        <td class="px-5 py-4 font-medium text-gray-200">Bs {{ number_format($o->total, 0) }}</td>
                         <td class="px-5 py-4 text-xs text-gray-500">{{ $o->fecha_ingreso?->format('d/m/Y') ?? '—' }}</td>
                         <td class="px-5 py-4 text-right">
                             <a href="{{ route('panel.ordenes.show', $o->id) }}" class="p-2 rounded-lg hover:bg-white/10 transition text-gray-400 hover:text-blue-400 inline-block" title="Ver">

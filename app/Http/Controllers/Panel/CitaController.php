@@ -4,14 +4,12 @@ namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
 use App\Services\CitaService;
-use App\Services\OrdenTrabajoService;
 use Illuminate\Http\Request;
 
 class CitaController extends Controller
 {
     public function __construct(
         protected CitaService $citaService,
-        protected OrdenTrabajoService $ordenTrabajoService
     ) {}
 
     public function index(Request $request)
@@ -29,7 +27,7 @@ class CitaController extends Controller
     public function show(int $id)
     {
         $cita = $this->citaService->obtenerPorId($id);
-        $mecanicos = $this->citaService->obtenerMecanicosDisponibles();
+        $mecanicos = $this->citaService->obtenerMecanicosDisponibles($cita);
 
         return view('panel.citas.show', compact('cita', 'mecanicos'));
     }
@@ -64,17 +62,6 @@ class CitaController extends Controller
             $this->citaService->cancelar($id);
             return redirect()->route('panel.citas.index')
                 ->with('success', 'Cita cancelada correctamente.');
-        } catch (\RuntimeException $e) {
-            return redirect()->back()->with('error', $e->getMessage());
-        }
-    }
-
-    public function crearOrden(int $id)
-    {
-        try {
-            $orden = $this->ordenTrabajoService->crearDesdeCita($id);
-            return redirect()->route('panel.ordenes.show', $orden->id)
-                ->with('success', 'Orden de trabajo #' . $orden->id . ' creada correctamente.');
         } catch (\RuntimeException $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }

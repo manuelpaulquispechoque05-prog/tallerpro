@@ -14,7 +14,10 @@
             </div>
         </div>
 
-        <form method="POST" action="{{ route('panel.inventario.store-ingreso') }}">
+        <form method="POST" action="{{ route('panel.inventario.store-ingreso') }}" x-data="{
+            moneda: 'Bs',
+            precio: '',
+        }">
             @csrf
             <div class="space-y-5">
                 <div>
@@ -32,6 +35,38 @@
                     <input name="cantidad" type="number" min="1" required class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" placeholder="Ej: 10">
                     @error('cantidad')<p class="mt-1.5 text-sm text-red-400">{{ $message }}</p>@enderror
                 </div>
+
+                <!-- Precio y moneda -->
+                <div class="grid sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1.5">Precio unitario</label>
+                        <input name="precio_unitario" type="number" step="0.01" min="0" x-model="precio"
+                               class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                               placeholder="0.00">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1.5">Moneda</label>
+                        <select name="moneda" x-model="moneda" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+                            <option value="Bs" class="bg-[#1a1a1a]">Bolivianos (Bs)</option>
+                            <option value="USD" class="bg-[#1a1a1a]">Dolares (USD)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1.5">Equivalente en Bs</label>
+                        <div class="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-gray-400">
+                            <template x-if="moneda === 'Bs'">
+                                <span x-text="precio ? 'Bs ' + parseFloat(precio).toFixed(2) : '—'"></span>
+                            </template>
+                            <template x-if="moneda === 'USD'">
+                                <span x-text="precio ? 'Bs ' + (parseFloat(precio) * {{ $tipoCambio }}).toFixed(2) : '—'"></span>
+                            </template>
+                            <template x-if="!precio || precio <= 0">
+                                <span>Sin precio</span>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="grid sm:grid-cols-2 gap-5">
                     <div>
                         <label class="block text-sm font-medium text-gray-300 mb-1.5">Numero de factura</label>

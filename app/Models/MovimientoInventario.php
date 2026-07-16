@@ -20,6 +20,7 @@ class MovimientoInventario extends Model
     protected $fillable = [
         'inventario_id', 'orden_trabajo_id', 'user_id',
         'tipo', 'cantidad', 'motivo',
+        'precio_unitario_original', 'moneda', 'tipo_cambio', 'precio_unitario_bs',
     ];
 
     public function inventario()
