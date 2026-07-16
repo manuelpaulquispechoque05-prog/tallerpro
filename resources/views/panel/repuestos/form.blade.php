@@ -1,6 +1,15 @@
-@props(['repuesto' => null, 'categorias', 'proveedores'])
+@props(['repuesto' => null, 'categorias', 'proveedores', 'tipoCambio' => 10.71])
 
-<div class="grid sm:grid-cols-2 gap-5">
+<div class="grid sm:grid-cols-2 gap-5" x-data="{
+    moneda: '{{ old('moneda_compra', $repuesto?->moneda_compra ?? 'Bs') }}',
+    precioOriginal: '{{ old('precio_compra_original', $repuesto?->precio_compra_original ?? $repuesto?->precio_compra ?? '') }}',
+    tipoCambio: {{ $tipoCambio }},
+    get precioBs() {
+        if (!this.precioOriginal || this.precioOriginal <= 0) return 0;
+        if (this.moneda === 'Bs') return parseFloat(this.precioOriginal);
+        return parseFloat(this.precioOriginal) * this.tipoCambio;
+    }
+}">
     <div>
         <label class="block text-sm font-medium text-gray-300 mb-1.5">Codigo *</label>
         <input name="codigo" type="text" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" value="{{ old('codigo', $repuesto?->codigo) }}" required placeholder="Ej: REP-001">
@@ -44,11 +53,37 @@
         @endif
         @error('proveedor_id')<p class="mt-1.5 text-sm text-red-400">{{ $message }}</p>@enderror
     </div>
-    <div>
-        <label class="block text-sm font-medium text-gray-300 mb-1.5">Precio compra *</label>
-        <input name="precio_compra" type="number" step="0.01" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" value="{{ old('precio_compra', $repuesto?->precio_compra) }}" required placeholder="0.00">
+
+    <!-- Precio de compra con moneda -->
+    <div class="sm:col-span-2">
+        <label class="block text-sm font-medium text-gray-300 mb-1.5">Precio de compra</label>
+        <div class="grid sm:grid-cols-4 gap-3">
+            <div class="sm:col-span-2">
+                <input name="precio_compra_original" type="number" step="0.01" min="0" x-model="precioOriginal"
+                       class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                       placeholder="0.00">
+                <input type="hidden" name="precio_compra" :value="precioBs.toFixed(2)">
+            </div>
+            <div>
+                <select name="moneda_compra" x-model="moneda" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+                    <option value="Bs" class="bg-[#1a1a1a]">Bolivianos (Bs)</option>
+                    <option value="USD" class="bg-[#1a1a1a]">Dolares (USD)</option>
+                </select>
+            </div>
+            <div>
+                <div class="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-gray-400 h-full">
+                    <template x-if="moneda === 'Bs'">
+                        <span>Bs <span x-text="precioOriginal ? parseFloat(precioOriginal).toFixed(2) : '0.00'"></span></span>
+                    </template>
+                    <template x-if="moneda === 'USD'">
+                        <span>Bs <span x-text="precioBs.toFixed(2)"></span> <span class="text-gray-600">(@{{ tipoCambio }})</span></span>
+                    </template>
+                </div>
+            </div>
+        </div>
         @error('precio_compra')<p class="mt-1.5 text-sm text-red-400">{{ $message }}</p>@enderror
     </div>
+
     <div>
         <label class="block text-sm font-medium text-gray-300 mb-1.5">Precio venta *</label>
         <input name="precio_venta" type="number" step="0.01" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" value="{{ old('precio_venta', $repuesto?->precio_venta) }}" required placeholder="0.00">

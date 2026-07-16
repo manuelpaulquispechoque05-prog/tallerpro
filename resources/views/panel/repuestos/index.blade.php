@@ -5,10 +5,40 @@
 <!-- Header -->
 <div class="flex flex-col sm:flex-row gap-3 mb-6">
     <div class="flex-1">
-        <form method="GET" x-data>
-            <div class="relative">
+        <form method="GET" action="{{ route('panel.repuestos.index') }}" class="flex flex-wrap gap-3 items-end">
+            <div class="relative flex-1 min-w-[200px]">
                 <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                <input type="text" name="busqueda" value="{{ $busqueda }}" placeholder="Buscar repuesto..." class="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" x-on:input.debounce.500ms="$el.form.submit()">
+                <input type="text" name="busqueda" value="{{ $busqueda }}" placeholder="Buscar repuesto..." class="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1">Desde</label>
+                <input type="date" name="desde" value="{{ request('desde') }}" class="px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-white">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1">Hasta</label>
+                <input type="date" name="hasta" value="{{ request('hasta') }}" class="px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-white">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1">Mes</label>
+                <select name="mes" class="px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-white">
+                    <option value="" class="bg-[#1a1a1a]">Todos</option>
+                    @foreach(range(1, 12) as $m)
+                        <option value="{{ $m }}" class="bg-[#1a1a1a]" {{ request('mes') == $m ? 'selected' : '' }}>{{ DateTime::createFromFormat('!m', $m)->format('F') }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1">Anio</label>
+                <select name="anio" class="px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-white">
+                    <option value="" class="bg-[#1a1a1a]">Todos</option>
+                    @foreach(range(now()->year, now()->year - 5, -1) as $y)
+                        <option value="{{ $y }}" class="bg-[#1a1a1a]" {{ request('anio') == $y ? 'selected' : '' }}>{{ $y }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="flex gap-2">
+                <button type="submit" class="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white text-xs font-semibold rounded-xl transition cursor-pointer">Filtrar</button>
+                <a href="{{ route('panel.repuestos.index') }}" class="px-4 py-2 bg-white/5 border border-white/10 text-gray-300 text-xs font-medium rounded-xl transition">Limpiar</a>
             </div>
         </form>
     </div>
@@ -37,7 +67,7 @@
                 <span class="text-[10px] px-2 py-0.5 rounded-full bg-gray-500/10 text-gray-400">{{ $r->proveedor?->nombre ?? '—' }}</span>
             </div>
             <div class="mt-3 flex items-center justify-between">
-                <span class="text-sm font-bold text-white">${{ number_format($r->precio_venta, 2) }}</span>
+                <span class="text-sm font-bold text-white">Bs {{ number_format($r->precio_venta, 2) }}</span>
                 @if($inv)
                     <span class="text-xs font-medium {{ $alerta ? 'text-red-400' : 'text-green-400' }}">{{ $inv->stock_actual }} en stock</span>
                 @else

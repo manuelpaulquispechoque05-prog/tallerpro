@@ -17,12 +17,28 @@
         <form method="POST" action="{{ route('panel.inventario.store-ingreso') }}" x-data="{
             moneda: 'Bs',
             precio: '',
+            repuestos: {{ json_encode($repuestos->map(fn($r) => [
+                'id' => $r->id,
+                'nombre' => $r->nombre,
+                'codigo' => $r->codigo,
+                'precio_compra_original' => (float)($r->precio_compra_original ?? $r->precio_compra ?? 0),
+                'moneda_compra' => $r->moneda_compra ?? 'Bs',
+            ])) }},
+
+            autocompletar(e) {
+                const id = e.target.value;
+                const r = this.repuestos.find(r => r.id == id);
+                if (r && r.precio_compra_original > 0) {
+                    this.precio = r.precio_compra_original;
+                    this.moneda = r.moneda_compra;
+                }
+            }
         }">
             @csrf
             <div class="space-y-5">
                 <div>
                     <label class="block text-sm font-medium text-gray-300 mb-1.5">Repuesto *</label>
-                    <select name="repuesto_id" required class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+                    <select name="repuesto_id" required @change="autocompletar" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50">
                         <option value="" class="bg-[#1a1a1a]">Seleccionar repuesto</option>
                         @foreach($repuestos as $r)
                             <option value="{{ $r->id }}" class="bg-[#1a1a1a]">{{ $r->nombre }} ({{ $r->codigo }})</option>

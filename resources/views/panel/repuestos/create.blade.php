@@ -6,7 +6,7 @@
         <h1 class="text-sm font-semibold text-gray-100 mb-6">Nuevo repuesto</h1>
         <form method="POST" action="{{ route('panel.repuestos.store') }}">
             @csrf
-            @include('panel.repuestos.form', ['repuesto' => null])
+            @include('panel.repuestos.form', ['repuesto' => null, 'tipoCambio' => $tipoCambio])
         </form>
     </div>
 </div>

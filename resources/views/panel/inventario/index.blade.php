@@ -61,10 +61,40 @@
         <p class="text-xs text-gray-500 mt-0.5">Stock por repuesto</p>
     </div>
     <div class="px-5 lg:px-6 py-3 border-b border-white/[0.06]">
-        <form method="GET" x-data>
-            <div class="relative max-w-md">
+        <form method="GET" action="{{ route('panel.inventario.index') }}" class="flex flex-wrap gap-3 items-end">
+            <div class="relative flex-1 min-w-[200px]">
                 <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                <input type="text" name="busqueda" value="{{ $busqueda }}" placeholder="Buscar por repuesto..." class="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50" x-on:input.debounce.500ms="$el.form.submit()">
+                <input type="text" name="busqueda" value="{{ $busqueda }}" placeholder="Buscar por repuesto..." class="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1">Desde</label>
+                <input type="date" name="desde" value="{{ request('desde') }}" class="px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-white">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1">Hasta</label>
+                <input type="date" name="hasta" value="{{ request('hasta') }}" class="px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-white">
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1">Mes</label>
+                <select name="mes" class="px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-white">
+                    <option value="" class="bg-[#1a1a1a]">Todos</option>
+                    @foreach(range(1, 12) as $m)
+                        <option value="{{ $m }}" class="bg-[#1a1a1a]" {{ request('mes') == $m ? 'selected' : '' }}>{{ DateTime::createFromFormat('!m', $m)->format('F') }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1">Anio</label>
+                <select name="anio" class="px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-white">
+                    <option value="" class="bg-[#1a1a1a]">Todos</option>
+                    @foreach(range(now()->year, now()->year - 5, -1) as $y)
+                        <option value="{{ $y }}" class="bg-[#1a1a1a]" {{ request('anio') == $y ? 'selected' : '' }}>{{ $y }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="flex gap-2">
+                <button type="submit" class="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white text-xs font-semibold rounded-xl transition cursor-pointer">Filtrar</button>
+                <a href="{{ route('panel.inventario.index') }}" class="px-4 py-2 bg-white/5 border border-white/10 text-gray-300 text-xs font-medium rounded-xl transition">Limpiar</a>
             </div>
         </form>
     </div>
@@ -73,9 +103,14 @@
             <thead>
                 <tr class="border-b border-white/[0.04]">
                     <th class="px-5 py-3.5 text-left text-[10px] font-semibold uppercase text-gray-600">Repuesto</th>
+                    <th class="px-5 py-3.5 text-left text-[10px] font-semibold uppercase text-gray-600">Codigo</th>
+                    <th class="px-5 py-3.5 text-left text-[10px] font-semibold uppercase text-gray-600">Categoria</th>
+                    <th class="px-5 py-3.5 text-left text-[10px] font-semibold uppercase text-gray-600">Proveedor</th>
                     <th class="px-5 py-3.5 text-left text-[10px] font-semibold uppercase text-gray-600">Sucursal</th>
                     <th class="px-5 py-3.5 text-right text-[10px] font-semibold uppercase text-gray-600">Stock</th>
                     <th class="px-5 py-3.5 text-right text-[10px] font-semibold uppercase text-gray-600">Minimo</th>
+                    <th class="px-5 py-3.5 text-right text-[10px] font-semibold uppercase text-gray-600">P. Compra</th>
+                    <th class="px-5 py-3.5 text-right text-[10px] font-semibold uppercase text-gray-600">P. Venta</th>
                     <th class="px-5 py-3.5 text-center text-[10px] font-semibold uppercase text-gray-600">Estado</th>
                     <th class="px-5 py-3.5 text-center text-[10px] font-semibold uppercase text-gray-600">Historial</th>
                 </tr>
@@ -89,10 +124,18 @@
                         $badgeParts = explode(' ', $badgeAlerta[$alerta], 3);
                     @endphp
                     <tr class="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
-                        <td class="px-5 py-4"><span class="text-sm text-gray-200">{{ $i->repuesto?->nombre }}</span><br><span class="text-xs text-gray-600">{{ $i->repuesto?->codigo }}</span></td>
+                        <td class="px-5 py-4">
+                            <span class="text-sm text-gray-200">{{ $i->repuesto?->nombre }}</span>
+                            <span class="text-xs text-gray-600 ml-1.5">{{ $i->repuesto?->codigo }}</span>
+                        </td>
+                        <td class="px-5 py-4 font-mono text-xs text-gray-500">{{ $i->repuesto?->codigo }}</td>
+                        <td class="px-5 py-4 text-xs text-gray-500">{{ $i->repuesto?->categoria?->nombre ?? '—' }}</td>
+                        <td class="px-5 py-4 text-xs text-gray-500">{{ $i->repuesto?->proveedor?->nombre ?? '—' }}</td>
                         <td class="px-5 py-4 text-sm text-gray-500">{{ $i->sucursal?->nombre ?? 'Principal' }}</td>
                         <td class="px-5 py-4 text-right text-sm font-medium {{ $colorAlerta[$alerta] }}">{{ $i->stock_actual }}</td>
                         <td class="px-5 py-4 text-right text-sm text-gray-500">{{ $i->stock_minimo }}</td>
+                        <td class="px-5 py-4 text-right text-sm text-gray-400">Bs {{ number_format($i->repuesto?->precio_compra ?? 0, 2) }}</td>
+                        <td class="px-5 py-4 text-right text-sm text-gray-400">Bs {{ number_format($i->repuesto?->precio_venta ?? 0, 2) }}</td>
                         <td class="px-5 py-4 text-center">
                             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {{ $badgeParts[0] }} {{ $badgeParts[1] }}">{{ $badgeParts[2] }}</span>
                         </td>
@@ -100,8 +143,8 @@
                             <a href="{{ route('panel.inventario.historial', $i->repuesto_id) }}" class="text-xs text-blue-400 hover:text-blue-300 transition">Ver movimientos</a>
                         </td>
                     </tr>
-                @empty
-                    <tr><td colspan="6" class="px-5 py-10 text-center text-sm text-gray-500">Sin registros de inventario</td></tr>
+                    @empty
+                        <tr><td colspan="11" class="px-5 py-10 text-center text-sm text-gray-500">Sin registros de inventario</td></tr>
                 @endforelse
             </tbody>
         </table>

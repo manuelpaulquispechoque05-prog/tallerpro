@@ -5,19 +5,22 @@ namespace App\Http\Controllers\Panel;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Panel\StoreRepuestoRequest;
 use App\Http\Requests\Panel\UpdateRepuestoRequest;
+use App\Services\ConfiguracionService;
 use App\Services\RepuestoService;
 use Illuminate\Http\Request;
 
 class RepuestoController extends Controller
 {
     public function __construct(
-        protected RepuestoService $repuestoService
+        protected RepuestoService $repuestoService,
+        protected ConfiguracionService $configuracionService,
     ) {}
 
     public function index(Request $request)
     {
         $busqueda = $request->get('busqueda');
-        $repuestos = $this->repuestoService->listar($busqueda);
+        $filtros = $request->only(['desde', 'hasta', 'mes', 'anio']);
+        $repuestos = $this->repuestoService->listar($busqueda, $filtros);
 
         return view('panel.repuestos.index', compact('repuestos', 'busqueda'));
     }
@@ -26,7 +29,8 @@ class RepuestoController extends Controller
     {
         $categorias = $this->repuestoService->listarCategorias();
         $proveedores = $this->repuestoService->listarProveedores();
-        return view('panel.repuestos.create', compact('categorias', 'proveedores'));
+        $tipoCambio = $this->configuracionService->getTipoCambio();
+        return view('panel.repuestos.create', compact('categorias', 'proveedores', 'tipoCambio'));
     }
 
     public function store(StoreRepuestoRequest $request)
@@ -48,7 +52,8 @@ class RepuestoController extends Controller
         $repuesto = $this->repuestoService->obtenerPorId($id);
         $categorias = $this->repuestoService->listarCategorias();
         $proveedores = $this->repuestoService->listarProveedores();
-        return view('panel.repuestos.edit', compact('repuesto', 'categorias', 'proveedores'));
+        $tipoCambio = $this->configuracionService->getTipoCambio();
+        return view('panel.repuestos.edit', compact('repuesto', 'categorias', 'proveedores', 'tipoCambio'));
     }
 
     public function update(UpdateRepuestoRequest $request, int $id)

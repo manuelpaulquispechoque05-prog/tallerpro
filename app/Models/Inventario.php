@@ -8,8 +8,6 @@ class Inventario extends Model
 {
     protected $table = 'inventario';
 
-    public $timestamps = false;
-
     protected $fillable = [
         'repuesto_id', 'sucursal_id', 'stock_actual', 'stock_minimo',
     ];

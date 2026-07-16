@@ -25,6 +25,8 @@ class UpdateRepuestoRequest extends FormRequest
             'precio_compra' => 'required|numeric|min:0',
             'precio_venta' => 'required|numeric|min:0',
             'unidad_medida' => 'nullable|string|max:20',
+            'precio_compra_original' => 'nullable|numeric|min:0',
+            'moneda_compra' => 'nullable|in:Bs,USD',
         ];
     }
 }

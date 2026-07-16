@@ -19,7 +19,8 @@ class InventarioController extends Controller
     public function index(Request $request)
     {
         $busqueda = $request->get('busqueda');
-        $items = $this->inventarioService->listar($busqueda);
+        $filtros = $request->only(['desde', 'hasta', 'mes', 'anio']);
+        $items = $this->inventarioService->listar($busqueda, $filtros);
         $alertas = $this->inventarioService->alertasStock();
         return view('panel.inventario.index', compact('items', 'busqueda', 'alertas'));
     }
@@ -60,9 +61,10 @@ class InventarioController extends Controller
         return view('panel.inventario.historial', compact('repuesto', 'movimientos'));
     }
 
-    public function movimientos()
+    public function movimientos(Request $request)
     {
-        $movimientos = $this->inventarioService->movimientos();
+        $filtros = $request->only(['desde', 'hasta', 'mes', 'anio']);
+        $movimientos = $this->inventarioService->movimientos(null, $filtros);
         return view('panel.inventario.movimientos', compact('movimientos'));
     }
 }

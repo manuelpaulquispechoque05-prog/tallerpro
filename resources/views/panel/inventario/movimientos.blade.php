@@ -7,6 +7,42 @@
     <p class="text-xs text-gray-500 mt-0.5">Trazabilidad completa de entradas, salidas y ajustes</p>
 </div>
 
+<!-- Filtros por fecha -->
+<div class="glass-card rounded-2xl p-5 lg:p-6 mb-6">
+    <form method="GET" action="{{ route('panel.inventario.movimientos') }}" class="flex flex-wrap items-end gap-3">
+        <div>
+            <label class="block text-xs font-medium text-gray-400 mb-1">Desde</label>
+            <input type="date" name="desde" value="{{ request('desde') }}" class="px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-white">
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-gray-400 mb-1">Hasta</label>
+            <input type="date" name="hasta" value="{{ request('hasta') }}" class="px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-white">
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-gray-400 mb-1">Mes</label>
+            <select name="mes" class="px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-white">
+                <option value="" class="bg-[#1a1a1a]">Todos</option>
+                @foreach(range(1, 12) as $m)
+                    <option value="{{ $m }}" class="bg-[#1a1a1a]" {{ request('mes') == $m ? 'selected' : '' }}>{{ DateTime::createFromFormat('!m', $m)->format('F') }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-gray-400 mb-1">Anio</label>
+            <select name="anio" class="px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-white">
+                <option value="" class="bg-[#1a1a1a]">Todos</option>
+                @foreach(range(now()->year, now()->year - 5, -1) as $y)
+                    <option value="{{ $y }}" class="bg-[#1a1a1a]" {{ request('anio') == $y ? 'selected' : '' }}>{{ $y }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="flex gap-2">
+            <button type="submit" class="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white text-xs font-semibold rounded-xl transition cursor-pointer">Filtrar</button>
+            <a href="{{ route('panel.inventario.movimientos') }}" class="px-4 py-2 bg-white/5 border border-white/10 text-gray-300 text-xs font-medium rounded-xl transition">Limpiar</a>
+        </div>
+    </form>
+</div>
+
 <div class="glass-card rounded-2xl overflow-hidden">
     <div class="overflow-x-auto">
         <table class="w-full text-sm">
@@ -88,5 +124,8 @@
             </tbody>
         </table>
     </div>
+    @if($movimientos->hasPages())
+        <div class="px-5 lg:px-6 py-4 border-t border-white/[0.06]">{{ $movimientos->links() }}</div>
+    @endif
 </div>
 @endsection

@@ -14,11 +14,14 @@ class Repuesto extends Model
     protected $fillable = [
         'categoria_id', 'proveedor_id', 'codigo', 'nombre', 'descripcion',
         'precio_compra', 'precio_venta', 'unidad_medida', 'activo',
+        'precio_compra_original', 'moneda_compra', 'tipo_cambio_compra',
     ];
 
     protected $casts = [
         'precio_compra' => 'decimal:2',
         'precio_venta' => 'decimal:2',
+        'precio_compra_original' => 'decimal:2',
+        'tipo_cambio_compra' => 'decimal:2',
     ];
 
     public function categoria()

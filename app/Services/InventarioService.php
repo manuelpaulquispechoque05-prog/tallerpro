@@ -12,11 +12,20 @@ class InventarioService
     public function __construct(
         protected ConfiguracionService $configuracionService
     ) {}
-    public function listar(string $busqueda = null)
+    public function listar(string $busqueda = null, array $filtros = [])
     {
+        $desde = $filtros['desde'] ?? null;
+        $hasta = $filtros['hasta'] ?? null;
+        $mes = $filtros['mes'] ?? null;
+        $anio = $filtros['anio'] ?? null;
+
         return Inventario::with(['repuesto.categoria', 'repuesto.proveedor', 'sucursal'])
             ->when($busqueda, fn($q) => $q->whereHas('repuesto', fn($r) => $r->where('nombre', 'like', "%{$busqueda}%")
                 ->orWhere('codigo', 'like', "%{$busqueda}%")))
+            ->when($desde, fn($q) => $q->whereDate('created_at', '>=', $desde))
+            ->when($hasta, fn($q) => $q->whereDate('created_at', '<=', $hasta))
+            ->when($mes, fn($q) => $q->whereMonth('created_at', $mes))
+            ->when($anio, fn($q) => $q->whereYear('created_at', $anio))
             ->orderByRaw('(stock_actual - stock_minimo) ASC')
             ->paginate(15)
             ->withQueryString();
@@ -43,7 +52,7 @@ class InventarioService
 
             $inventario = Inventario::firstOrCreate(
                 ['repuesto_id' => $repuesto->id, 'sucursal_id' => $data['sucursal_id'] ?? 1],
-                ['stock_actual' => 0, 'stock_minimo' => 5]
+                ['stock_actual' => 0, 'stock_minimo' => 1]
             );
 
             $inventario->increment('stock_actual', $data['cantidad']);
@@ -109,8 +118,13 @@ class InventarioService
         });
     }
 
-    public function movimientos(int $inventarioId = null, int $limit = 30)
+    public function movimientos(int $inventarioId = null, array $filtros = [])
     {
+        $desde = $filtros['desde'] ?? null;
+        $hasta = $filtros['hasta'] ?? null;
+        $mes = $filtros['mes'] ?? null;
+        $anio = $filtros['anio'] ?? null;
+
         return MovimientoInventario::with([
             'inventario.repuesto.categoria',
             'inventario.sucursal',
@@ -118,9 +132,13 @@ class InventarioService
             'ordenTrabajo',
         ])
             ->when($inventarioId, fn($q) => $q->where('inventario_id', $inventarioId))
+            ->when($desde, fn($q) => $q->whereDate('created_at', '>=', $desde))
+            ->when($hasta, fn($q) => $q->whereDate('created_at', '<=', $hasta))
+            ->when($mes, fn($q) => $q->whereMonth('created_at', $mes))
+            ->when($anio, fn($q) => $q->whereYear('created_at', $anio))
             ->latest('created_at')
-            ->take($limit)
-            ->get();
+            ->paginate(30)
+            ->withQueryString();
     }
 
     public function movimientosPorRepuesto(int $repuestoId, int $limit = 50)
@@ -139,7 +157,10 @@ class InventarioService
 
     public function repuestosParaIngreso()
     {
-        return Repuesto::orderBy('nombre')->get(['id', 'nombre', 'codigo']);
+        return Repuesto::orderBy('nombre')->get([
+            'id', 'nombre', 'codigo',
+            'precio_compra_original', 'moneda_compra', 'tipo_cambio_compra', 'precio_compra',
+        ]);
     }
 
     public function verificarStock(int $repuestoId, int $cantidad): bool
