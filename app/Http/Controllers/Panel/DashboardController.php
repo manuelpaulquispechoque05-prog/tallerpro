@@ -15,7 +15,7 @@ class DashboardController extends Controller
     {
         $kpis = $this->dashboardService->kpis();
         $donut = $this->dashboardService->citasPorEstado();
-        $line = $this->dashboardService->citasPorMes();
+        $line = $this->dashboardService->ordenesPorMes();
         $ultimasCitas = $this->dashboardService->ultimasCitas();
 
         return view('panel.dashboard.index', compact(

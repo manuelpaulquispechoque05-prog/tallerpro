@@ -1,10 +1,9 @@
-@extends('layouts.panel')
-@section('title', 'Dashboard')
+<?php $__env->startSection('title', 'Dashboard'); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 <!-- KPIs -->
 <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 lg:gap-4 mb-6">
-    @php
+    <?php
         $kpiData = [
             ['label' => 'Clientes registrados', 'value' => $kpis['clientes_registrados'], 'icon' => 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z', 'color' => 'green'],
             ['label' => 'Ordenes completadas', 'value' => $kpis['ordenes_completadas'], 'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', 'color' => 'green'],
@@ -20,20 +19,20 @@
             'blue' => ['from' => 'from-blue-500/20', 'to' => 'to-blue-600/10', 'text' => 'text-blue-400'],
             'red' => ['from' => 'from-red-500/20', 'to' => 'to-red-600/10', 'text' => 'text-red-400'],
         ];
-    @endphp
+    ?>
 
-    @foreach($kpiData as $i => $k)
-        @php $g = $gradMap[$k['color']]; @endphp
-        <div class="animate-in animate-in-d{{ $i + 1 }} glass-card rounded-2xl p-4 lg:p-5 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300">
+    <?php $__currentLoopData = $kpiData; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $k): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <?php $g = $gradMap[$k['color']]; ?>
+        <div class="animate-in animate-in-d<?php echo e($i + 1); ?> glass-card rounded-2xl p-4 lg:p-5 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300">
             <div class="flex items-start justify-between mb-3">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-br {{ $g['from'] }} {{ $g['to'] }} flex items-center justify-center">
-                    <svg class="w-5 h-5 {{ $g['text'] }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="{{ $k['icon'] }}"/></svg>
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br <?php echo e($g['from']); ?> <?php echo e($g['to']); ?> flex items-center justify-center">
+                    <svg class="w-5 h-5 <?php echo e($g['text']); ?>" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="<?php echo e($k['icon']); ?>"/></svg>
                 </div>
             </div>
-            <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">{{ $k['label'] }}</p>
-            <p class="mt-1 text-2xl lg:text-3xl font-bold text-white tracking-tight">{{ $k['value'] }}</p>
+            <p class="text-xs font-medium text-gray-500 uppercase tracking-wider"><?php echo e($k['label']); ?></p>
+            <p class="mt-1 text-2xl lg:text-3xl font-bold text-white tracking-tight"><?php echo e($k['value']); ?></p>
         </div>
-    @endforeach
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 </div>
 
 <!-- Charts -->
@@ -55,7 +54,7 @@
                 <h3 class="text-sm font-semibold text-gray-100">Ordenes completadas</h3>
                 <p class="text-xs text-gray-500 mt-0.5">Ultimos 6 meses</p>
             </div>
-            <span class="text-xs text-gray-600 bg-white/[0.04] px-2.5 py-1 rounded-full">{{ now()->year }}</span>
+            <span class="text-xs text-gray-600 bg-white/[0.04] px-2.5 py-1 rounded-full"><?php echo e(now()->year); ?></span>
         </div>
         <div id="lineChart" style="height: 260px;"></div>
     </div>
@@ -68,7 +67,7 @@
             <h3 class="text-sm font-semibold text-gray-100">Ultimas citas</h3>
             <p class="text-xs text-gray-500 mt-0.5">Actividad reciente del taller</p>
         </div>
-        <a href="{{ route('panel.citas.index') }}" class="text-xs font-medium text-blue-400 hover:text-blue-300 transition">Ver todas</a>
+        <a href="<?php echo e(route('panel.citas.index')); ?>" class="text-xs font-medium text-blue-400 hover:text-blue-300 transition">Ver todas</a>
     </div>
     <div class="overflow-x-auto">
         <table class="w-full text-sm">
@@ -83,7 +82,7 @@
                 </tr>
             </thead>
             <tbody>
-                @php
+                <?php
                     $colorEstado = [
                         'pendiente' => ['label' => 'Pendiente', 'dot' => 'bg-yellow-400', 'bg' => 'bg-yellow-500/10', 'text' => 'text-yellow-400'],
                         'confirmada' => ['label' => 'Confirmada', 'dot' => 'bg-blue-400', 'bg' => 'bg-blue-500/10', 'text' => 'text-blue-400'],
@@ -91,27 +90,28 @@
                         'completada' => ['label' => 'Completada', 'dot' => 'bg-green-400', 'bg' => 'bg-green-500/10', 'text' => 'text-green-400'],
                         'cancelada' => ['label' => 'Cancelada', 'dot' => 'bg-gray-400', 'bg' => 'bg-gray-500/10', 'text' => 'text-gray-400'],
                     ];
-                @endphp
-                @forelse($ultimasCitas as $c)
-                    @php $e = $colorEstado[$c->estado] ?? $colorEstado['pendiente']; @endphp
+                ?>
+                <?php $__empty_1 = true; $__currentLoopData = $ultimasCitas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $c): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    <?php $e = $colorEstado[$c->estado] ?? $colorEstado['pendiente']; ?>
                     <tr class="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
-                        <td class="px-5 py-3.5 font-medium text-gray-300">#{{ $c->id }}</td>
-                        <td class="px-5 py-3.5 text-gray-400">{{ $c->cliente?->nombre_completo ?? '—' }}</td>
-                        <td class="px-5 py-3.5 text-sm text-gray-400">{{ $c->servicio?->nombre ?? 'Diagnostico' }}</td>
-                        <td class="px-5 py-3.5 text-sm text-gray-500">{{ $c->tipoVehiculo?->nombre ?? '—' }}</td>
+                        <td class="px-5 py-3.5 font-medium text-gray-300">#<?php echo e($c->id); ?></td>
+                        <td class="px-5 py-3.5 text-gray-400"><?php echo e($c->cliente?->nombre_completo ?? '—'); ?></td>
+                        <td class="px-5 py-3.5 text-sm text-gray-400"><?php echo e($c->servicio?->nombre ?? 'Diagnostico'); ?></td>
+                        <td class="px-5 py-3.5 text-sm text-gray-500"><?php echo e($c->tipoVehiculo?->nombre ?? '—'); ?></td>
                         <td class="px-5 py-3.5">
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium {{ $e['bg'] }} {{ $e['text'] }}">
-                                <span class="w-1.5 h-1.5 rounded-full {{ $e['dot'] }}"></span>
-                                {{ $e['label'] }}
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium <?php echo e($e['bg']); ?> <?php echo e($e['text']); ?>">
+                                <span class="w-1.5 h-1.5 rounded-full <?php echo e($e['dot']); ?>"></span>
+                                <?php echo e($e['label']); ?>
+
                             </span>
                         </td>
-                        <td class="px-5 py-3.5 text-xs text-gray-600">{{ $c->fecha_hora?->format('d/m') ?? '—' }}</td>
+                        <td class="px-5 py-3.5 text-xs text-gray-600"><?php echo e($c->fecha_hora?->format('d/m') ?? '—'); ?></td>
                     </tr>
-                @empty
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                     <tr>
                         <td colspan="6" class="px-5 py-10 text-center text-sm text-gray-500">Sin registros</td>
                     </tr>
-                @endforelse
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
@@ -124,10 +124,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const gridColor = 'rgba(255,255,255,0.04)';
 
     new ApexCharts(document.querySelector('#donutChart'), {
-        series: @json($donut['series']),
+        series: <?php echo json_encode($donut['series'], 15, 512) ?>,
         chart: { type: 'donut', height: 260, background: 'transparent' },
-        labels: @json($donut['labels']),
-        colors: @json($donut['colors']),
+        labels: <?php echo json_encode($donut['labels'], 15, 512) ?>,
+        colors: <?php echo json_encode($donut['colors'], 15, 512) ?>,
         stroke: { show: false },
         dataLabels: { enabled: false },
         plotOptions: {
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     labels: {
                         show: true,
                         name: { show: true, fontSize: '13px', color: textColor, offsetY: -5 },
-                        total: { show: true, label: 'Total', fontSize: '14px', color: textColor, formatter: () => @json(array_sum($donut['series'])) },
+                        total: { show: true, label: 'Total', fontSize: '14px', color: textColor, formatter: () => <?php echo json_encode(array_sum($donut['series']), 15, 512) ?> },
                         value: { show: true, fontSize: '24px', fontWeight: 700, color: '#f8fafc', formatter: (v) => v }
                     }
                 }
@@ -148,13 +148,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }).render();
 
     new ApexCharts(document.querySelector('#lineChart'), {
-        series: [{ name: 'Completadas', data: @json($line['values']) }],
+        series: [{ name: 'Completadas', data: <?php echo json_encode($line['values'], 15, 512) ?> }],
         chart: { type: 'area', height: 260, background: 'transparent', toolbar: { show: false }, zoom: { enabled: false } },
         colors: ['#3b82f6'],
         fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.25, opacityTo: 0, stops: [0, 90, 100] } },
         stroke: { curve: 'smooth', width: 2 },
         xaxis: {
-            categories: @json($line['categories']),
+            categories: <?php echo json_encode($line['categories'], 15, 512) ?>,
             labels: { style: { colors: textColor, fontSize: '11px' } },
             axisBorder: { show: false },
             axisTicks: { show: false }
@@ -167,4 +167,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }).render();
 });
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.panel', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\laragon\www\TallerPro\resources\views/panel/dashboard/index.blade.php ENDPATH**/ ?>

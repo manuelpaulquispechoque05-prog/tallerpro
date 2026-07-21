@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Cita;
 use App\Models\Cliente;
-use App\Models\Repuesto;
+use App\Models\OrdenTrabajo;
 use App\Models\Vehiculo;
 
 class DashboardService
@@ -23,6 +23,11 @@ class DashboardService
             'clientes_registrados' => Cliente::where('activo', true)->count(),
             'vehiculos_registrados' => Vehiculo::where('activo', true)->count(),
             'citas_pendientes' => Cita::where('estado', 'pendiente')->count(),
+            'ordenes_completadas' => OrdenTrabajo::where('estado', 'completado')->count(),
+            'ingresos_mes' => OrdenTrabajo::where('estado', 'completado')
+                ->whereMonth('fecha_entrega', now()->month)
+                ->whereYear('fecha_entrega', now()->year)
+                ->sum('total'),
             'total_repuestos' => $inv['total_repuestos'],
             'total_mecanicos' => $mec['total_mecanicos'],
             'mecanicos_disponibles' => $mec['mecanicos_disponibles'],
@@ -42,14 +47,14 @@ class DashboardService
             'pendiente' => 'Pendiente',
             'confirmada' => 'Confirmada',
             'asignada' => 'Asignada',
-            'atendida' => 'Atendida',
+            'completada' => 'Completada',
             'cancelada' => 'Cancelada',
         ];
         $colors = [
             'pendiente' => '#eab308',
             'confirmada' => '#3b82f6',
             'asignada' => '#8b5cf6',
-            'atendida' => '#22c55e',
+            'completada' => '#22c55e',
             'cancelada' => '#6b7280',
         ];
 
@@ -66,7 +71,7 @@ class DashboardService
         return ['series' => $series, 'labels' => $cats, 'colors' => $cols];
     }
 
-    public function citasPorMes(): array
+    public function ordenesPorMes(): array
     {
         $meses = collect();
         for ($i = 5; $i >= 0; $i--) {
@@ -78,9 +83,9 @@ class DashboardService
             ]);
         }
 
-        $data = Cita::where('estado', 'atendida')
-            ->whereBetween('fecha_hora', [now()->subMonths(6)->startOfMonth(), now()->endOfMonth()])
-            ->selectRaw('YEAR(fecha_hora) as anio, MONTH(fecha_hora) as mes, count(*) as total')
+        $data = OrdenTrabajo::where('estado', 'completado')
+            ->whereBetween('fecha_entrega', [now()->subMonths(6)->startOfMonth(), now()->endOfMonth()])
+            ->selectRaw('YEAR(fecha_entrega) as anio, MONTH(fecha_entrega) as mes, count(*) as total')
             ->groupBy('anio', 'mes')
             ->get()
             ->keyBy(fn($item) => $item->anio . '-' . $item->mes);

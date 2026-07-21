@@ -23,7 +23,7 @@ class MecanicoService
     {
         return Mecanico::with('especialidad', 'sucursal')
             ->withCount([
-                'citas as citas_asignadas' => fn($q) => $q->whereIn('estado', ['asignada', 'atendida']),
+                'citas as citas_asignadas' => fn($q) => $q->whereIn('estado', ['asignada', 'completada']),
                 'ordenesTrabajo as ordenes_activas' => fn($q) => $q->where('estado', 'en_proceso'),
                 'ordenesTrabajo as ordenes_finalizadas' => fn($q) => $q->where('estado', 'completado'),
             ])

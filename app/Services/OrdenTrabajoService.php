@@ -163,43 +163,58 @@ class OrdenTrabajoService
 
     // ─── CAMBIOS DE ESTADO ─────────────────────────────────────────────
 
-    public function iniciar(int $ordenId): void
+    /**
+     * Mapa de transiciones permitidas: [estadoActual => [nuevoEstado, ...]].
+     */
+    private array $transiciones = [
+        'pendiente'  => ['en_proceso', 'cancelado'],
+        'en_proceso'  => ['completado', 'cancelado'],
+    ];
+
+    /**
+     * Metodo centralizado que valida y ejecuta cualquier cambio de estado.
+     * Los metodos publicos (iniciar, completar, cancelar) delegan aqui.
+     */
+    private function cambiarEstado(int $ordenId, string $nuevoEstado): void
     {
         $orden = OrdenTrabajo::findOrFail($ordenId);
 
-        if ($orden->estado !== 'pendiente') {
-            throw new \RuntimeException('Solo se puede iniciar una orden en estado pendiente.');
+        // Validar que la transicion sea permitida
+        if (!isset($this->transiciones[$orden->estado]) || !in_array($nuevoEstado, $this->transiciones[$orden->estado])) {
+            throw new \RuntimeException("No se puede cambiar el estado a {$nuevoEstado} desde {$orden->estado}.");
         }
 
-        $orden->update([
-            'estado' => 'en_proceso',
-            'fecha_ingreso' => $orden->fecha_ingreso ?? now(),
-        ]);
+        $updates = ['estado' => $nuevoEstado];
+
+        if ($nuevoEstado === 'en_proceso') {
+            $updates['fecha_ingreso'] = $orden->fecha_ingreso ?? now();
+        }
+
+        if ($nuevoEstado === 'completado') {
+            $updates['fecha_entrega'] = now();
+            // Sincronizar: la cita asociada pasa a completada
+            Cita::where('orden_trabajo_id', $ordenId)
+                ->where('estado', '!=', 'completada')
+                ->where('estado', '!=', 'cancelada')
+                ->update(['estado' => 'completada']);
+        }
+
+        $orden->update($updates);
+    }
+
+    public function iniciar(int $ordenId): void
+    {
+        $this->cambiarEstado($ordenId, 'en_proceso');
     }
 
     public function completar(int $ordenId): void
     {
-        $orden = OrdenTrabajo::findOrFail($ordenId);
-
-        if ($orden->estado !== 'en_proceso') {
-            throw new \RuntimeException('Solo se puede completar una orden en proceso.');
-        }
-
-        $orden->update([
-            'estado' => 'completado',
-            'fecha_entrega' => now(),
-        ]);
+        $this->cambiarEstado($ordenId, 'completado');
     }
 
     public function cancelar(int $ordenId): void
     {
-        $orden = OrdenTrabajo::findOrFail($ordenId);
-
-        if (in_array($orden->estado, ['completado', 'cancelado'])) {
-            throw new \RuntimeException('La orden ya esta ' . $orden->estado);
-        }
-
-        $orden->update(['estado' => 'cancelado']);
+        $this->cambiarEstado($ordenId, 'cancelado');
     }
 
     // ─── RECALCULO ─────────────────────────────────────────────────────

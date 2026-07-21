@@ -126,8 +126,8 @@ class CitaService
     {
         $cita = Cita::with('ordenTrabajo')->findOrFail($id);
 
-        if (in_array($cita->estado, ['atendida'])) {
-            throw new \RuntimeException('No se puede cancelar una cita ya atendida.');
+        if (in_array($cita->estado, ['completada'])) {
+            throw new \RuntimeException('No se puede cancelar una cita ya completada.');
         }
 
         $cita->update(['estado' => 'cancelada']);
